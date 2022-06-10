@@ -1,7 +1,6 @@
 ## (Bootstrap) Bill
 
-`bill` is a simple tool to perform a bootstrap of Serpent OS in a reproducible fashion. The resulting output of the process is a small set of `.stone` archives forming an initial bootstrap repository to then
-build the rest of the distribution.
+`bill` is a simple tool to perform a bootstrap of Serpent OS in a reproducible fashion. The resulting output of the process is a small set of `.stone` archives forming an initial bootstrap repository to then build the rest of the distribution.
 
 The resulting repository should be **immutable** and the distribution bootstrapped (rebuilt with user-facing packages) with these.
 
