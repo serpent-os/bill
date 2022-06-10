@@ -1,6 +1,14 @@
-import std.stdio;
+/* SPDX-License-Identifier: Zlib */
+
+/**
+ * Bill
+ *
+ * Main entry point
+ *
+ * Authors: © 2022 Serpent OS Developers
+ * License: ZLib
+ */
 
 void main()
 {
-	writeln("Edit source/app.d to start your project.");
 }
