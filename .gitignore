@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/bill
+bill.so
+bill.dylib
+bill.dll
+bill.a
+bill.lib
+bill-test-*
+*.exe
+*.o
+*.obj
+*.lst
