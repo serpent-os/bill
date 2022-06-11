@@ -10,7 +10,8 @@
  */
 module main;
 
-import std.experimental.logger;
+import std.stdio : stderr;
+import bill.logging;
 
 /**
  * BuildHost helps identify certain host OS requirements
@@ -58,7 +59,6 @@ BuildConfiguration buildConfiguration()
         {
             continue;
         }
-        error(readLink(p.source).absolutePath);
         bc.host.usrMerged = false;
         break;
     }
@@ -68,13 +68,13 @@ BuildConfiguration buildConfiguration()
 
 void main()
 {
-    info("Checking host configuration");
+    trace("Checking host configuration");
     const auto bc = buildConfiguration();
     if (!bc.host.usrMerged)
     {
-        fatal("Unsupported build host - /usr is not merged");
+        error("Unsupported build host - /usr is not merged");
         return;
     }
 
-    info("Host configuration supported");
+    info("Host configuration is supported");
 }
