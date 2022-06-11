@@ -30,6 +30,8 @@ final class ColorLogger : Logger
 
     /**
      * Write a new log message to stdout/stderr
+     *
+     * Params:    payload   The log payload
      */
     override void writeLogMsg(ref LogEntry payload) @trusted
     {
