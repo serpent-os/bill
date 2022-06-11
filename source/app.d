@@ -14,6 +14,17 @@ import std.stdio : stderr;
 import bill.logging;
 
 /**
+ * Configure our multilogging
+ */
+private static void configureLogging()
+{
+    auto mlog = new MultiLogger(LogLevel.all);
+    mlog.insertLogger("tui", new ColorLogger(LogLevel.all));
+    mlog.insertLogger("file", new FileLogger("bill.log", LogLevel.all));
+    sharedLog = mlog;
+}
+
+/**
  * BuildHost helps identify certain host OS requirements
  */
 struct BuildHost
@@ -68,6 +79,17 @@ BuildConfiguration buildConfiguration()
 
 void main()
 {
+    configureLogging();
+
+    trace("--- bill is now starting ---");
+    scope (exit)
+    {
+        trace("--- bill is now exiting normally ---");
+    }
+    scope (failure)
+    {
+        error("--- bill exited abnormally ---");
+    }
     trace("Checking host configuration");
     const auto bc = buildConfiguration();
     if (!bc.host.usrMerged)

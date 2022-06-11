@@ -15,14 +15,6 @@ public import std.experimental.logger;
 
 import std.stdio : stderr;
 
-/** 
- * Establish our logger as the default
- */
-shared static this()
-{
-    sharedLog = new ColorLogger(LogLevel.all);
-}
-
 /**
  * Simplistic logger that provides colourised output
  */
