@@ -84,7 +84,7 @@ void main()
     trace("--- bill is now starting ---");
     scope (exit)
     {
-        trace("--- bill is now exiting normally ---");
+        trace("--- bill exited normally ---");
     }
     scope (failure)
     {
