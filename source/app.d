@@ -16,11 +16,11 @@ import bill.logging;
 /**
  * Configure our multilogging
  */
-private static void configureLogging()
+private static void configureLogging(LogLevel level = LogLevel.all)
 {
-    auto mlog = new MultiLogger(LogLevel.all);
-    mlog.insertLogger("tui", new ColorLogger(LogLevel.all));
-    mlog.insertLogger("file", new FileLogger("bill.log", LogLevel.all));
+    auto mlog = new MultiLogger(level);
+    mlog.insertLogger("tui", new ColorLogger(level));
+    mlog.insertLogger("file", new FileLogger("bill.log", level));
     sharedLog = mlog;
 }
 
