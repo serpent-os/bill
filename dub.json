@@ -5,5 +5,10 @@
 	"copyright": "Copyright © 2022, Serpent OS Developers",
 	"description": "Serpent OS Bootstrapper",
 	"license": "Zlib",
-	"name": "bill"
+	"name": "bill",
+	"dependencies": {
+		"moss-deps": {
+			"path": "../moss-deps"
+		}
+        }
 }
