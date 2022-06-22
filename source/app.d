@@ -17,6 +17,7 @@ module main;
 import bill.buildconf;
 
 import moss.core.logging : configureLogging;
+import std.experimental.logger;
 
 void main()
 {

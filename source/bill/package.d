@@ -14,4 +14,4 @@
  */
 module bill;
 
-public import bill.logging;
+public import bill.buildconf;
