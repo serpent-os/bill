@@ -15,6 +15,7 @@
 		}
 	},
 	"dflags": [
-		"-preview=dip1000"
+		"-preview=dip1000",
+		"-preview=in"
 	]
 }
