@@ -41,7 +41,7 @@ package:
     /**
      * Construct stage with given index
      */
-    this(ulong index)
+    this(ulong index) @safe @nogc nothrow
     {
         _index = index;
     }
