@@ -34,15 +34,20 @@ struct BuildConfiguration
 {
     /** Information on the host */
     BuildHost host;
+
+    /** Base directory */
     string rootDir;
 }
 
 /**
- * Return a build configuration at runtime
+ * Construct a build configuration at runtime
+ *
+ * Params:
+ *      buildDir = Root of all build/data
  *
  * Returns: an instantiated BuildConfiguration.
  */
-BuildConfiguration buildConfiguration(in string buildDir) @safe nothrow
+BuildConfiguration buildConfiguration(const string buildDir) @safe nothrow
 {
     BuildConfiguration bc;
     bc.rootDir = assumeWontThrow(buildDir.absolutePath);
@@ -59,7 +64,7 @@ BuildConfiguration buildConfiguration(in string buildDir) @safe nothrow
 
     foreach (p; paths)
     {
-        auto cmpEqual = assumeWontThrow(p.source.exists && isSymlink(p.source)
+        immutable cmpEqual = assumeWontThrow(p.source.exists && isSymlink(p.source)
                 && p.source.readLink.absolutePath("/") == p.target);
         if (cmpEqual)
         {
