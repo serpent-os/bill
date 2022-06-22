@@ -14,8 +14,8 @@
  */
 module bill.buildconf;
 
-import std.file : isSymlink;
-import std.file : readLink;
+import std.exception : assumeWontThrow;
+import std.file : isSymlink, readLink, exists;
 import std.path : absolutePath;
 
 /**
@@ -41,7 +41,7 @@ struct BuildConfiguration
  *
  * Returns: an instantiated BuildConfiguration.
  */
-BuildConfiguration buildConfiguration()
+BuildConfiguration buildConfiguration() @safe nothrow
 {
     BuildConfiguration bc;
 
@@ -57,7 +57,9 @@ BuildConfiguration buildConfiguration()
 
     foreach (p; paths)
     {
-        if (isSymlink(p.source) && readLink(p.source).absolutePath("/") == p.target)
+        auto cmpEqual = assumeWontThrow(p.source.exists && isSymlink(p.source)
+                && p.source.readLink.absolutePath("/") == p.target);
+        if (cmpEqual)
         {
             continue;
         }
