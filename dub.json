@@ -13,5 +13,8 @@
 		"moss-deps": {
 			"path": "../moss-deps"
 		}
-	}
+	},
+	"dflags": [
+		"-preview=dip1000"
+	]
 }
