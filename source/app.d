@@ -15,11 +15,16 @@
 module main;
 
 import bill.buildconf;
+import bill.stage;
 
 import moss.core.logging : configureLogging;
 import std.experimental.logger;
+import std.file : dirEntries, SpanMode, exists;
+import std.string : startsWith;
+import std.conv : to;
+import std.path : baseName;
 
-void main() @safe
+void main() @system
 {
     configureLogging();
 
@@ -43,5 +48,32 @@ void main() @safe
 
     trace(bc);
 
+    Stage[] stages;
+    immutable stageDir = bc.rootDir ~ "/stages";
+    if (!stageDir.exists)
+    {
+        errorf("Stage directory is missing: %s", stageDir);
+        return;
+    }
+
+    foreach (i; dirEntries(stageDir, SpanMode.shallow, false))
+    {
+        auto s = i.name.baseName;
+        immutable prefix = "stage";
+        if (!s.startsWith(prefix))
+        {
+            continue;
+        }
+        auto nom = s[prefix.length .. $];
+        if (nom.length < 1)
+        {
+            errorf("Invalid stage tree: %s", nom);
+            return;
+        }
+        auto id = to!ulong(nom);
+        stages ~= new Stage(id);
+    }
+
     info("Host configuration is supported");
+    trace(stages);
 }

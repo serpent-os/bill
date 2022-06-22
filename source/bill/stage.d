@@ -16,6 +16,8 @@
  */
 module bill.stage;
 
+import std.string : format;
+
 /**
  * Stage encapsulation
  *
@@ -27,6 +29,14 @@ final class Stage
     @disable this();
 
     /**
+     * Construct stage with given index
+     */
+    this(ulong index) @safe @nogc nothrow
+    {
+        _index = index;
+    }
+
+    /**
      * Index property
      *
      * Returns: index of this stage
@@ -36,14 +46,9 @@ final class Stage
         return _index;
     }
 
-package:
-
-    /**
-     * Construct stage with given index
-     */
-    this(ulong index) @safe @nogc nothrow
+    override pure const(string) toString() @safe
     {
-        _index = index;
+        return format!"stage(%d)"(_index);
     }
 
 private:
