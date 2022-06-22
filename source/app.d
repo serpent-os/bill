@@ -33,12 +33,15 @@ void main() @safe
         error("--- bill exited abnormally ---");
     }
     trace("Checking host configuration");
-    const auto bc = buildConfiguration();
+    /* Always the relative . directory. */
+    const auto bc = buildConfiguration(".");
     if (!bc.host.usrMerged)
     {
         error("Unsupported build host - /usr is not merged");
         return;
     }
+
+    trace(bc);
 
     info("Host configuration is supported");
 }

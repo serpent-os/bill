@@ -34,6 +34,7 @@ struct BuildConfiguration
 {
     /** Information on the host */
     BuildHost host;
+    string rootDir;
 }
 
 /**
@@ -41,9 +42,10 @@ struct BuildConfiguration
  *
  * Returns: an instantiated BuildConfiguration.
  */
-BuildConfiguration buildConfiguration() @safe nothrow
+BuildConfiguration buildConfiguration(in string buildDir) @safe nothrow
 {
     BuildConfiguration bc;
+    bc.rootDir = assumeWontThrow(buildDir.absolutePath);
 
     static struct CheckPath
     {
