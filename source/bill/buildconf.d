@@ -64,8 +64,8 @@ BuildConfiguration buildConfiguration(const string buildDir) @safe nothrow
 
     foreach (p; paths)
     {
-        immutable cmpEqual = assumeWontThrow(p.source.exists && isSymlink(p.source)
-                && p.source.readLink.absolutePath("/") == p.target);
+        immutable cmpEqual = assumeWontThrow(p.source.exists
+                && isSymlink(p.source) && p.source.readLink.absolutePath("/") == p.target);
         if (cmpEqual)
         {
             continue;
