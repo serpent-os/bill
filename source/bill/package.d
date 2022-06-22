@@ -15,3 +15,4 @@
 module bill;
 
 public import bill.buildconf;
+public import bill.stage;
