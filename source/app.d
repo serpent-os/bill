@@ -9,8 +9,8 @@
  *
  * Main entry point
  *
- * Authors: © 2022 Serpent OS Developers
- * License: ZLib
+ * Authors: Copyright © 2022 Serpent OS Developers
+ * License: Zlib
  */
 module main;
 

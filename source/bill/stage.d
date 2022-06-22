@@ -11,8 +11,8 @@
  * an encapsulation of build tasks to ensure a sane bootstrap
  * process.
  *
- * Authors: © 2022 Serpent OS Developers
- * License: ZLib
+ * Authors: Copyright © 2022 Serpent OS Developers
+ * License: Zlib
  */
 module bill.stage;
 

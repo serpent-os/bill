@@ -9,8 +9,8 @@
  *
  * Helpers for determining build configuration
  *
- * Authors: © 2022 Serpent OS Developers
- * License: ZLib
+ * Authors: Copyright © 2022 Serpent OS Developers
+ * License: Zlib
  */
 module bill.buildconf;
 
