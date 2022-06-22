@@ -15,18 +15,8 @@
 module main;
 
 import bill.buildconf;
-import bill.logging;
 
-/**
- * Configure our multilogging
- */
-private static void configureLogging(LogLevel level = LogLevel.all)
-{
-    auto mlog = new MultiLogger(level);
-    mlog.insertLogger("tui", new ColorLogger(level));
-    mlog.insertLogger("file", new FileLogger("bill.log", level));
-    sharedLog = mlog;
-}
+import moss.core.logging : configureLogging;
 
 void main()
 {

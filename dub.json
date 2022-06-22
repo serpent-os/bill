@@ -7,8 +7,11 @@
 	"license": "Zlib",
 	"name": "bill",
 	"dependencies": {
+		"moss-core": {
+			"path": "../moss-core"
+		},
 		"moss-deps": {
 			"path": "../moss-deps"
 		}
-        }
+	}
 }
