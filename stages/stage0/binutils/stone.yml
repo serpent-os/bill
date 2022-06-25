@@ -22,7 +22,7 @@ setup       : |
                --enable-deterministic-archives \
                --disable-nls \
                --disable-werror \
-               --target=%(build) \
+               --target=%(host_platform) \
                --with-static-standard-libraries \
                --with-build-sysroot=%(bootstrap_root) \
                --without-debuginfod \
