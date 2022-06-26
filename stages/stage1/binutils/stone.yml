@@ -16,21 +16,24 @@ license     :
     - LGPL-2.1-or-later
     - LGPL-3.0-or-later
 setup       : |
-    %configure --with-sysroot=%(bootstrap_root) \
-               --disable-bootstrap \
-               --disable-nls \
-               --disable-shared \
-               --disable-werror \
-               --enable-64-bit-bfd \
-               --enable-deterministic-archives \
-               --enable-lto \
-               --enable-plugins \
-               --enable-static \
-               --target=%(host_platform) \
-               --with-build-sysroot=%(bootstrap_root) \
-               --with-static-standard-libraries \
-               --without-debuginfod
+    mkdir build && pushd build
+    ../configure --with-sysroot=%(bootstrap_root) \
+                 --target=%(host_platform) \
+                 --disable-bootstrap \
+                 --disable-nls \
+                 --disable-shared \
+                 --disable-werror \
+                 --enable-64-bit-bfd \
+                 --enable-deterministic-archives \
+                 --enable-lto \
+                 --enable-plugins \
+                 --enable-static \
+                 --with-build-sysroot=%(bootstrap_root) \
+                 --with-static-standard-libraries \
+                 --without-debuginfod \
+                 --prefix=%(prefix) \
+                 --libdir=%(libdir)
 build       : |
-    %make tooldir=%(prefix)
+    pushd build && %make tooldir=%(prefix)
 install     : |
-    %make_install tooldir=%(prefix)
+    pushd build && %make_install tooldir=%(prefix)
