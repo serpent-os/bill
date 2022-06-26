@@ -23,13 +23,13 @@ setup       : |
                --disable-werror \
                --enable-64-bit-bfd \
                --enable-deterministic-archives \
-               --enable-lto
+               --enable-lto \
                --enable-plugins \
                --enable-static \
                --target=%(host_platform) \
                --with-build-sysroot=%(bootstrap_root) \
                --with-static-standard-libraries \
-               --without-debuginfod \
+               --without-debuginfod
 build       : |
     %make tooldir=%(prefix)
 install     : |
