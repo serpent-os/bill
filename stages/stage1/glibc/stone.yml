@@ -12,8 +12,8 @@ license     :
     - LGPL-2.1-or-later
 toolchain   : gnu
 builddeps   :
-    - linux-headers
     - gcc
+    - linux-headers
 setup       : |
     mkdir build && pushd build
     # glibc dies on --gc-sections
