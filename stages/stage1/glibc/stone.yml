@@ -12,6 +12,7 @@ license     :
     - LGPL-2.1-or-later
 toolchain   : gnu
 builddeps   :
+    - linux-headers
     - gcc
 setup       : |
     mkdir build && pushd build
