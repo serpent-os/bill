@@ -27,6 +27,10 @@ license     :
     - LGPL-3.0-or-later
     - NCSA
 setup       : |
+    # Ensure its all mounted!
+    test -x /bill/bin/as
+    test -x /bill/bin/%(host_platform)-ar
+
     ln -s ../mpc-1.2.1 mpc
     ln -s ../mpfr-4.1.0 mpfr
     ln -s ../gmp-6.2.1 gmp
@@ -34,28 +38,35 @@ setup       : |
     mkdir gcc-build && pushd gcc-build
 
     ../configure --prefix=%(prefix) \
-                 --build=%(build_platform) \
+                 --target=%(host_platform) \
                  --disable-bootstrap \
-                 --disable-libcc1 \
+                 --disable-decimal-float \
+                 --disable-libatomic \
+                 --disable-libgomp \
+                 --disable-libquadmath \
+                 --disable-libssp \
+                 --disable-libvtv \
                  --disable-multilib \
                  --disable-nls \
                  --disable-shared \
                  --disable-threads \
-                 --enable-initfini-array   \
+                 --disable-threads \
+                 --enable-initfini-array \
                  --enable-languages=c,c++ \
                  --enable-lto \
+                 --enable-static \
                  --libdir=%(libdir) \
                  --sysconfdir=%(sysconfdir) \
-                 --target=%(host_platform) \
                  --with-gcc-major-version-only \
                  --with-glibc-version=2.5 \
                  --with-newlib \
                  --with-sysroot=%(bootstrap_root) \
                  --without-headers \
+                 --disable-gcov \
                  LD="ld.bfd"
 build       : |
     pushd gcc-build
-    %make all-gcc
+    %make
 install     : |
     pushd gcc-build
-    %make_install all-gcc
+    %make_install
