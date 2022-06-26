@@ -1,0 +1,60 @@
+name        : gcc
+version     : 12.1.0
+release     : 1
+homepage    : https://ftp.gnu.org/gnu/gcc/gcc-12.1.0
+upstreams   :
+    - https://ftp.gnu.org/gnu/gcc/gcc-12.1.0/gcc-12.1.0.tar.xz : 62fd634889f31c02b64af2c468f064b47ad1ca78411c45abe6ac4b5f8dd19c7b
+    - https://gcc.gnu.org/pub/gcc/infrastructure/mpfr-4.1.0.tar.bz2: feced2d430dd5a97805fa289fed3fc8ff2b094c02d05287fd6133e7f1f0ec926
+    - https://gcc.gnu.org/pub/gcc/infrastructure/mpc-1.2.1.tar.gz : 17503d2c395dfcf106b622dc142683c1199431d095367c6aacba6eec30340459
+    - https://gcc.gnu.org/pub/gcc/infrastructure/gmp-6.2.1.tar.bz2: eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c
+summary     : GNU Compiler Collection
+description : |
+    Static build of the GNU Compiler Collection, providing:
+
+     - g++
+     - gcc
+toolchain   : gnu
+license     :
+    - Apache-2.0
+    - BSD-3-Clause
+    - BSL-1.0
+    - bzip2-1.0.6
+    - GCC-exception-3.1
+    - GPL-2.0-or-later
+    - GPL-3.0-or-later
+    - JSON
+    - LGPL-2.1-or-later
+    - LGPL-3.0-or-later
+    - NCSA
+setup       : |
+    ln -s ../mpc-1.2.1 mpc
+    ln -s ../mpfr-4.1.0 mpfr
+    ln -s ../gmp-6.2.1 gmp
+
+    mkdir gcc-build && pushd gcc-build
+
+    ../configure --prefix=%(prefix) \
+                 --build=%(build_platform) \
+                 --disable-bootstrap \
+                 --disable-multilib \
+                 --disable-nls \
+                 --disable-shared \
+                 --disable-threads \
+                 --enable-initfini-array   \
+                 --enable-languages=c,c++ \
+                 --enable-lto \
+                 --libdir=%(libdir) \
+                 --sysconfdir=%(sysconfdir) \
+                 --target=%(host_platform) \
+                 --with-gcc-major-version-only \
+                 --with-glibc-version=2.5 \
+                 --with-newlib \
+                 --with-sysroot=%(bootstrap_root) \
+                 --without-headers \
+                 LD="ld.bfd"
+build       : |
+    pushd gcc-build
+    %make all-gcc
+install     : |
+    pushd gcc-build
+    %make_install all-gcc
