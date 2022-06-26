@@ -22,18 +22,22 @@ function buildUnion()
     done
 }
 
+function buildPackage()
+{
+    local PKG="$1"
+    ${CONTAINER} \
+        -u 0 -n \
+        -d "${UNION_TREE}" \
+        -s PATH="/bootstrap/bin:/usr/bin:/usr/sbin" \
+        -s TERM="xterm-256color" \
+        --bind-ro=/usr=/usr \
+        --bind-ro=/run=/run \
+        --bind-ro=/etc=/etc \
+        --bind-ro=$(pwd)/tools=/bootstrap \
+        --bind-rw=$(pwd)/stages/"${PKG}"=/testing \
+        -- \
+        boulder bi /testing/stone.yml -o /testing/ -a x86_64-stage1 -u -d
+}
 
 buildUnion
-
-${CONTAINER} \
-    -u 0 -n \
-    -d "${UNION_TREE}" \
-    -s PATH="/bootstrap/bin:/usr/bin:/usr/sbin" \
-    -s TERM="xterm-256color" \
-    --bind-ro=/usr=/usr \
-    --bind-ro=/run=/run \
-    --bind-ro=/etc=/etc \
-    --bind-ro=$(pwd)/tools=/bootstrap \
-    --bind-rw=$(pwd)/stages/stage0/binutils=/testing \
-    -- \
-    boulder bi /testing/stone.yml -o /testing/ -a x86_64-stage1 -u -d
+buildPackage stage1/binutils
