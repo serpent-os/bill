@@ -9,6 +9,9 @@ description : |
     Linux kernel API headers
 license     :
     - GPL-2.0-or-later
+toolchain   : gnu
+builddeps   :
+    - gcc
 install     : |
     %make headers_install INSTALL_HDR_PATH=%(installroot)/%(prefix)
     find %(installroot)/%(prefix) -name '.*' | xargs -I{} rm -v {}

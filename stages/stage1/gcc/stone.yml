@@ -14,6 +14,8 @@ description : |
      - g++
      - gcc
 toolchain   : gnu
+builddeps   :
+    - binutils
 license     :
     - Apache-2.0
     - BSD-3-Clause

@@ -11,6 +11,8 @@ license     :
     - GPL-2.0-or-later
     - LGPL-2.1-or-later
 toolchain   : gnu
+builddeps   :
+    - gcc
 setup       : |
     mkdir build && pushd build
     # glibc dies on --gc-sections
