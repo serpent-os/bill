@@ -36,6 +36,7 @@ setup       : |
     ../configure --prefix=%(prefix) \
                  --build=%(build_platform) \
                  --disable-bootstrap \
+                 --disable-libcc1 \
                  --disable-multilib \
                  --disable-nls \
                  --disable-shared \
