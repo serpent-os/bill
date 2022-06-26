@@ -1,0 +1,28 @@
+name        : glibc
+version     : 2.35
+release     : 1
+homepage    : https://ftp.gnu.org/gnu/glibc
+upstreams   :
+    - https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz : 5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e
+summary     : GNU C library
+description : |
+    GNU C library
+license     :
+    - GPL-2.0-or-later
+    - LGPL-2.1-or-later
+toolchain   : gnu
+setup       : |
+    mkdir build && pushd build
+    # glibc dies on --gc-sections
+    unset LDFLAGS
+    ../configure --prefix=%(prefix) \
+                 --build=%(build_platform) \
+                 --enable-kernel=3.2 \
+                 --with-headers=%(bootstrap_root)/include \
+                 --without-selinux
+build       : |
+    unset LDFLAGS
+    pushd build && %make
+install     : |
+    unset LDFLAGS
+    pushd build && %make_install
