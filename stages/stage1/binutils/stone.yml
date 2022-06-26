@@ -7,7 +7,6 @@ upstreams   :
 summary     : A GNU collection of binary utilities
 description : |
     A GNU Collection of binary utilities
-toolchain   : gnu
 license     :
     - BSL-1.0
     - GPL-2.0-or-later
@@ -15,6 +14,7 @@ license     :
     - LGPL-2.0-or-later
     - LGPL-2.1-or-later
     - LGPL-3.0-or-later
+toolchain   : gnu
 setup       : |
     mkdir build && pushd build
     ../configure --with-sysroot=%(bootstrap_root) \
