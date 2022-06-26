@@ -17,17 +17,19 @@ license     :
     - LGPL-3.0-or-later
 setup       : |
     %configure --with-sysroot=%(bootstrap_root) \
+               --disable-bootstrap \
+               --disable-nls \
                --disable-shared \
+               --disable-werror \
                --enable-64-bit-bfd \
                --enable-deterministic-archives \
-               --disable-nls \
-               --disable-werror \
+               --enable-lto
+               --enable-plugins \
+               --enable-static \
                --target=%(host_platform) \
-               --with-static-standard-libraries \
                --with-build-sysroot=%(bootstrap_root) \
+               --with-static-standard-libraries \
                --without-debuginfod \
-               --disable-bootstrap \
-               --disable-shared \
 build       : |
     %make tooldir=%(prefix)
 install     : |
