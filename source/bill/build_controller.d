@@ -27,10 +27,11 @@ final class BuildController
     /**
      * Add a recipe to our set of work
      */
-    void addRecipe(Spec *recipe) @system
+    void addRecipe(Spec* recipe) @system
     {
         recipes ~= recipe;
-        trace(format!"Loaded recipe for %s [%s]"(recipe.source.name, recipe.source.versionIdentifier));
+        trace(format!"Loaded recipe for %s [%s]"(recipe.source.name,
+                recipe.source.versionIdentifier));
     }
 
 private:

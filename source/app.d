@@ -69,7 +69,7 @@ void main() @system
     /* Sort ascending */
     stages.sort!"a.index < b.index";
     stages.each!((s) {
-        info(format!"Loading stage: %s"(s.index));
+        info(format!"Loading recipes in stage %s"(s.index));
         s.loadRecipes();
     });
 }
