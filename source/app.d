@@ -17,7 +17,7 @@ module main;
 import bill.buildconf;
 import bill.stage;
 
-import moss.core.logging : configureLogging;
+import moss.core.logging;
 import std.algorithm : filter, map, sort, each;
 import std.array : array;
 import std.conv : to;
@@ -29,7 +29,7 @@ import std.string : startsWith, format;
 
 void main() @system
 {
-    configureLogging();
+    configureLogging(ColorLoggerFlags.Color|ColorLoggerFlags.Timestamps);
     globalLogLevel = LogLevel.trace;
 
     trace("--- bill is now starting ---");
