@@ -27,6 +27,7 @@ import bill.build_plugin;
 import std.range : empty;
 import std.array : array;
 import std.algorithm : map, joiner;
+import bill.build_queue;
 
 /**
  * Stage encapsulation
@@ -49,6 +50,7 @@ final class Stage
         registry = new RegistryManager();
         plugin = new BuildPlugin();
         registry.addPlugin(plugin);
+        buildQueue = new BuildQueue();
 
         immutable nom = workTree.baseName;
         immutable partial = nom["stage".length .. $];
@@ -152,4 +154,5 @@ private:
     RegistryManager registry;
 
     RegistryItem[] workQueue;
+    BuildQueue buildQueue;
 }

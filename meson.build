@@ -39,6 +39,7 @@ global_includes = [
 bill_sources = [
 	'source/bill/package.d',
 	'source/bill/build_plugin.d',
+	'source/bill/build_queue.d',
 	'source/bill/buildconf.d',
 	'source/bill/stage.d',
 	'source/app.d',
