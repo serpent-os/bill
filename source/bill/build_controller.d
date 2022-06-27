@@ -19,6 +19,8 @@ import moss.format.source.spec;
 import std.experimental.logger;
 import std.string : format;
 import moss.deps.registry;
+import std.array : array;
+import std.range : empty;
 
 /**
  * Handle integration of recipes in the Registry
@@ -104,6 +106,20 @@ final class BuildController
         plugin.addRecipe(recipe);
         trace(format!"Loaded recipe for %s [%s]"(recipe.source.name,
                 recipe.source.versionIdentifier));
+    }
+
+    void build()
+    {
+        /* We need to build and install everything in the stage. */
+        auto names = cast(RegistryItem[]) registry.listAvailable().array;
+        Transaction tx = registry.transaction();
+        tx.installPackages(names);
+        auto toApply = tx.apply();
+        if (toApply.empty)
+        {
+            fatal("No build order defined!");
+        }
+        info(format!"Build order: %s"(toApply));
     }
 
 private:

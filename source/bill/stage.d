@@ -101,6 +101,11 @@ final class Stage
         }
     }
 
+    void build() @system
+    {
+        controller.build();
+    }
+
 private:
 
     ulong _index;

@@ -71,5 +71,6 @@ void main() @system
     stages.each!((s) {
         info(format!"Loading recipes in stage %s"(s.index));
         s.loadRecipes();
+        s.build();
     });
 }
