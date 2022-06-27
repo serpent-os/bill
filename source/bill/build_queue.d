@@ -23,6 +23,7 @@ import std.container.rbtree;
 import std.datetime.systime : Clock, SysTime;
 import std.experimental.logger;
 import std.string : format;
+import std.parallelism : totalCPUs;
 
 /**
  * Every build gets a job index.
@@ -72,10 +73,20 @@ public final class BuildQueue
 
     /**
      * Construct a new BuildQueue and initialise as empty
+     *
+     * Params:
+     *      numWorkers  = Number of worker threads, 0 for automatic.
      */
-    this()
+    this(int numWorkers = 0) @safe
     {
         builds = new BuildTree();
+
+        if (numWorkers == 0)
+        {
+            numWorkers = totalCPUs() - 1;
+        }
+
+        info(format!"BuildQueue initialised with %d workers"(numWorkers));
     }
 
     /**
@@ -115,4 +126,5 @@ private:
 
     BuildTree builds;
     ulong buildIndex;
+    uint numWorkers;
 }
