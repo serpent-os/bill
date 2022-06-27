@@ -18,7 +18,7 @@ import bill.buildconf;
 import bill.stage;
 
 import moss.core.logging : configureLogging;
-import std.algorithm : filter, map, sort;
+import std.algorithm : filter, map, sort, each;
 import std.array : array;
 import std.conv : to;
 import std.experimental.logger;
@@ -68,5 +68,8 @@ void main() @system
     }
     /* Sort ascending */
     stages.sort!"a.index < b.index";
-    trace(stages);
+    stages.each!((s) {
+        info(format!"Loading stage: %s"(s.index));
+        s.loadRecipes();
+    });
 }

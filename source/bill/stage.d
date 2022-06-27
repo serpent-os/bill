@@ -17,9 +17,13 @@
 module bill.stage;
 
 import std.experimental.logger;
-import std.string : format;
+import std.string : format, endsWith;
 import std.path : baseName;
 import std.conv : to, ConvException;
+import std.stdio : File;
+import std.file : dirEntries, SpanMode;
+import moss.format.source.spec;
+import bill.build_controller;
 
 /**
  * Stage encapsulation
@@ -39,6 +43,7 @@ final class Stage
         /* We're loaded in a map operation */
         _workTree = workTree.dup;
         _index = 0;
+        controller = new BuildController();
 
         immutable nom = workTree.baseName;
         immutable partial = nom["stage".length .. $];
@@ -78,8 +83,27 @@ final class Stage
         return format!"stage(%d)"(_index);
     }
 
+    /**
+     * Attempt to locate all recipes and load them
+     */
+    void loadRecipes() @system
+    {
+        foreach (item; dirEntries(_workTree, SpanMode.depth, false))
+        {
+            auto bn = item.baseName;
+            if (!bn.endsWith(".yml"))
+            {
+                continue;
+            }
+            auto spec = new Spec(File(item.name));
+            spec.parse();
+            controller.addRecipe(spec);
+        }
+    }
+
 private:
 
     ulong _index;
     string _workTree;
+    BuildController controller;
 }
