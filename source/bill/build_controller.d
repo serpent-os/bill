@@ -20,7 +20,7 @@ import std.experimental.logger;
 import std.algorithm : filter, map;
 import std.string : format;
 import moss.deps.registry;
-import std.array : array;
+import std.array : array, byPair;
 import std.range : empty;
 
 /**
@@ -30,12 +30,21 @@ final class BuildPlugin : RegistryPlugin
 {
 
     /**
-     * No support for anything
+     * Perform a provider lookup
      */
     override RegistryItem[] queryProviders(in DependencyType dt, in string matcher,
             ItemFlags flags = ItemFlags.None)
     {
-        return null;
+        switch (dt)
+        {
+        case DependencyType.PackageName:
+            return recipes.byPair
+                .filter!((r) => r.value.source.name == matcher)
+                .map!((r) => recipetoItem(r.value))
+                .array;
+        default:
+            return null;
+        }
     }
 
     /** Noop */
@@ -44,7 +53,7 @@ final class BuildPlugin : RegistryPlugin
         return ItemInfo();
     }
 
-    /** Noop */
+    /** Return dependencies */
     override const(Dependency)[] dependencies(in string pkgID) const
     {
         auto r = recipes[pkgID];
@@ -59,12 +68,12 @@ final class BuildPlugin : RegistryPlugin
         return [Provider(r.source.name, ProviderType.PackageName)];
     }
 
-    /** noop */
+    /** No fetching supported by us */
     override void fetchItem(FetchContext fc, in string pkgID)
     {
     }
 
-    /** Noop */
+    /** List all of the items */
     override const(RegistryItem)[] list(in ItemFlags flags) const
     {
         return recipes.values
@@ -79,9 +88,15 @@ final class BuildPlugin : RegistryPlugin
             .array;
     }
 
+    /** Direct lookup */
     override NullableRegistryItem queryID(in string pkgID) const
     {
-        return NullableRegistryItem(RegistryItem.init);
+        auto s = pkgID in recipes;
+        if (s is null)
+        {
+            return NullableRegistryItem(RegistryItem.init);
+        }
+        return NullableRegistryItem(recipetoItem(*s));
     }
 
     /** Noop */
