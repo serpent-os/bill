@@ -17,7 +17,7 @@ module bill.build_controller;
 
 import moss.format.source.spec;
 import std.experimental.logger;
-import std.algorithm : filter, map;
+import std.algorithm : filter, map, joiner;
 import std.string : format;
 import moss.deps.registry;
 import std.array : array, byPair;
@@ -50,7 +50,10 @@ final class BuildPlugin : RegistryPlugin
     /** Noop */
     override ItemInfo info(in string pkgID) const
     {
-        return ItemInfo();
+        auto r = recipes[pkgID];
+        return ItemInfo(r.source.name, r.rootPackage.summary,
+                r.rootPackage.description, r.source.release, r.source.versionIdentifier,
+                r.source.homepage, cast(immutable(string)[]) r.source.license);
     }
 
     /** Return dependencies */
@@ -170,7 +173,8 @@ final class BuildController
             }
             fatal("quitting");
         }
-        info(format!"Build order: %s"(toApply.map!((a) => a.pkgID)));
+        auto renderString = toApply.map!((a) => format!"%s (%s)"(a.info.name, a.info.versionID));
+        info(format!"Build order: %s"(renderString.joiner(", ")));
     }
 
 private:
