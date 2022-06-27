@@ -26,6 +26,8 @@ import std.datetime.systime : Clock, SysTime;
 import std.experimental.logger;
 import std.parallelism : totalCPUs;
 import std.string : format;
+import core.sync.mutex;
+import core.sync.condition;
 
 /**
  * Every build gets a job index.
@@ -79,7 +81,7 @@ public final class BuildQueue
      * Params:
      *      numWorkers  = Number of worker threads, 0 for automatic.
      */
-    this(int numWorkers = 0) @safe
+    this(int numWorkers = 0) @system
     {
         builds = new BuildTree();
 
@@ -89,6 +91,9 @@ public final class BuildQueue
         }
         workers.reserve(numWorkers);
         workers.length = numWorkers;
+
+        mutNotify = new Mutex();
+        condNotify = new Condition(mutNotify);
 
         info(format!"BuildQueue initialised with %d workers"(numWorkers));
     }
@@ -154,4 +159,6 @@ private:
     uint numWorkers;
     bool running;
     BuildWorker[] workers;
+    __gshared Condition condNotify;
+    __gshared Mutex mutNotify;
 }
