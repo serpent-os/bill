@@ -20,7 +20,7 @@ module bill.build_queue;
 
 import bill.build_worker;
 import core.atomic : atomicFetchAdd;
-import std.concurrency : send, receive, register, thisTid;
+import std.concurrency : send, receive, receiveOnly, register, thisTid;
 import std.container.rbtree;
 import std.datetime.systime : Clock, SysTime;
 import std.experimental.logger;
@@ -28,6 +28,7 @@ import std.parallelism : totalCPUs;
 import std.string : format;
 import core.sync.mutex;
 import core.sync.condition;
+import bill.build_api;
 
 /**
  * Every build gets a job index.
@@ -89,6 +90,7 @@ public final class BuildQueue
         {
             numWorkers = totalCPUs() - 1;
         }
+        this.numWorkers = numWorkers;
         workers.reserve(numWorkers);
         workers.length = numWorkers;
 
@@ -113,16 +115,30 @@ public final class BuildQueue
             workers[i].start();
         }
 
-        /* Cleanup time. */
-        foreach (ref worker; workers)
-        {
-            worker.join();
-            worker.destroy();
-        }
+        ulong activeWorkers = 0;
 
         while (running)
         {
-            break;
+            receive(/* Await startup for all workers first */
+                    (WorkerActivatedMessage msg) {
+                msg.sender.send(WorkerActivatedResponse());
+                ++activeWorkers;
+
+                /* All workers are now up and running */
+                if (activeWorkers == numWorkers)
+                {
+                    /* TODO: Pivot workers into work mode */
+                    trace("STOPPING BUILDS");
+                    running = false;
+                }
+            });
+        }
+
+        /* Tear down the workers */
+        foreach (ref thr; workers)
+        {
+            thr.join();
+            thr.destroy();
         }
     }
 

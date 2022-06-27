@@ -20,6 +20,9 @@ module bill.build_worker;
 
 import core.thread.osthread;
 import std.experimental.logger;
+import std.concurrency : send, receive, receiveOnly, thisTid, Tid, locate;
+import std.string : format;
+import bill.build_api;
 
 /**
  * Implements a simple build worker mechanism via threading
@@ -46,8 +49,16 @@ private:
      */
     void runnable() @system
     {
-        error("We can't actually run yet :(");
+        auto controller = locate("buildQueueMain");
+        ourID = thisTid();
+
+        /* Immediately send a "we're up message" */
+        controller.send(WorkerActivatedMessage(ourID));
+        receiveOnly!WorkerActivatedResponse;
+
+        info(format!"Worker %d registered"(workerIndex));
     }
 
     uint workerIndex;
+    Tid ourID;
 }

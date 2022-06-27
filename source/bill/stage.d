@@ -141,6 +141,8 @@ final class Stage
             fatal("quitting");
         }
         toApply.each!((i) => buildQueue.enqueue(i.pkgID));
+
+        buildQueue.run();
     }
 
 private:
