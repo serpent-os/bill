@@ -155,7 +155,7 @@ final class BuildController
             }
             fatal("quitting");
         }
-        info(format!"Build order: %s"(toApply));
+        info(format!"Build order: %s"(toApply.map!((a) => a.pkgID)));
     }
 
 private:
