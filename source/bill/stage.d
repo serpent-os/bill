@@ -16,18 +16,18 @@
  */
 module bill.stage;
 
-import std.experimental.logger;
-import std.string : format, endsWith;
-import std.path : baseName;
-import std.conv : to, ConvException;
-import std.stdio : File;
-import std.file : dirEntries, SpanMode;
-import moss.format.source.spec;
 import bill.build_plugin;
-import std.range : empty;
-import std.array : array;
-import std.algorithm : map, joiner;
 import bill.build_queue;
+import moss.format.source.spec;
+import std.algorithm : each, joiner, map;
+import std.array : array;
+import std.conv : ConvException, to;
+import std.experimental.logger;
+import std.file : dirEntries, SpanMode;
+import std.path : baseName;
+import std.range : empty;
+import std.stdio : File;
+import std.string : endsWith, format;
 
 /**
  * Stage encapsulation
@@ -140,10 +140,7 @@ final class Stage
             }
             fatal("quitting");
         }
-
-        workQueue = toApply;
-        auto renderString = workQueue.map!((a) => format!"%s (%s)"(a.info.name, a.info.versionID));
-        info(format!"Build order: %s"(renderString.joiner(", ")));
+        toApply.each!((i) => buildQueue.enqueue(i.pkgID));
     }
 
 private:
@@ -153,6 +150,5 @@ private:
     BuildPlugin plugin;
     RegistryManager registry;
 
-    RegistryItem[] workQueue;
     BuildQueue buildQueue;
 }

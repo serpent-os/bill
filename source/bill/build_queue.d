@@ -18,8 +18,11 @@
 
 module bill.build_queue;
 
+import core.atomic : atomicFetchAdd;
 import std.container.rbtree;
 import std.datetime.systime : Clock, SysTime;
+import std.experimental.logger;
+import std.string : format;
 
 /**
  * Every build gets a job index.
@@ -80,10 +83,36 @@ public final class BuildQueue
      */
     void run()
     {
+    }
 
+    /**
+     * Enqueue the operation.
+     *
+     * Do *NOT* use this outside of the main thread!
+     *
+     * Params:
+     *      pkgID   = Corresponding package ID
+     */
+    void enqueue(const(string) pkgID)
+    {
+        immutable auto mctime = Clock.currTime();
+        auto job = BuildItem(nextBuildIndex, pkgID, mctime, mctime);
+        builds.insert([job]);
+        trace(format!"New job allocated: %s"(job));
     }
 
 private:
 
+    /**
+     * Atomically increment the build index, return last usable
+     *
+     * Returns: new build ID
+     */
+    ulong nextBuildIndex() @safe @nogc nothrow
+    {
+        return atomicFetchAdd(buildIndex, 1);
+    }
+
     BuildTree builds;
+    ulong buildIndex;
 }
