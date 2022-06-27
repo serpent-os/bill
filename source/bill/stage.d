@@ -16,7 +16,10 @@
  */
 module bill.stage;
 
+import std.experimental.logger;
 import std.string : format;
+import std.path : baseName;
+import std.conv : to, ConvException;
 
 /**
  * Stage encapsulation
@@ -29,11 +32,30 @@ final class Stage
     @disable this();
 
     /**
-     * Construct stage with given index
+     * Construct stage with given work tree
      */
-    this(ulong index) @safe @nogc nothrow
+    this(in string workTree) @trusted
     {
-        _index = index;
+        /* We're loaded in a map operation */
+        _workTree = workTree.dup;
+        _index = 0;
+
+        immutable nom = workTree.baseName;
+        immutable partial = nom["stage".length .. $];
+        if (partial.length < 1)
+        {
+            return;
+        }
+        /* We'll dump core if this is wrong. Users fault. */
+        try
+        {
+            _index = partial.to!ulong;
+        }
+        catch (ConvException ex)
+        {
+            fatal(format!"Invalid stage tree \"%s\".\nError: %s"(nom, ex));
+        }
+        _index = partial.to!ulong;
     }
 
     /**
@@ -59,4 +81,5 @@ final class Stage
 private:
 
     ulong _index;
+    string _workTree;
 }

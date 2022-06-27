@@ -18,21 +18,21 @@ import bill.buildconf;
 import bill.stage;
 
 import moss.core.logging : configureLogging;
+import std.algorithm : filter, map, sort;
+import std.array : array;
+import std.conv : to;
 import std.experimental.logger;
 import std.file : dirEntries, SpanMode, exists;
-import std.string : startsWith;
-import std.conv : to;
 import std.path : baseName;
+import std.range : empty;
+import std.string : startsWith, format;
 
 void main() @system
 {
     configureLogging();
+    globalLogLevel = LogLevel.trace;
 
     trace("--- bill is now starting ---");
-    scope (exit)
-    {
-        trace("--- bill exited normally ---");
-    }
     scope (failure)
     {
         error("--- bill exited abnormally ---");
@@ -45,35 +45,28 @@ void main() @system
         error("Unsupported build host - /usr is not merged");
         return;
     }
+    info("Host configuration is supported");
 
     trace(bc);
 
-    Stage[] stages;
+    /* Load the stages now */
     immutable stageDir = bc.rootDir ~ "/stages";
     if (!stageDir.exists)
     {
-        errorf("Stage directory is missing: %s", stageDir);
+        error(format!"Stage directory is missing: %s"(stageDir));
         return;
     }
 
-    foreach (i; dirEntries(stageDir, SpanMode.shallow, false))
+    auto stages = stageDir.dirEntries(SpanMode.shallow, false).array
+        .filter!((s) => s.baseName.startsWith("stage") && s.isDir)
+        .map!((s) => new Stage(s.name))
+        .array;
+    if (stages.empty)
     {
-        auto s = i.name.baseName;
-        immutable prefix = "stage";
-        if (!s.startsWith(prefix))
-        {
-            continue;
-        }
-        auto nom = s[prefix.length .. $];
-        if (nom.length < 1)
-        {
-            errorf("Invalid stage tree: %s", nom);
-            return;
-        }
-        auto id = to!ulong(nom);
-        stages ~= new Stage(id);
+        error("No valid stages found");
+        return;
     }
-
-    info("Host configuration is supported");
+    /* Sort ascending */
+    stages.sort!"a.index < b.index";
     trace(stages);
 }
