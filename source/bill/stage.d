@@ -138,6 +138,9 @@ final class Stage
         }
         auto renderString = toApply.map!((a) => format!"%s (%s)"(a.info.name, a.info.versionID));
         info(format!"Build order: %s"(renderString.joiner(", ")));
+
+        /* Current work queue */
+        workQueue = toApply;
     }
 
 private:
@@ -146,4 +149,6 @@ private:
     string _workTree;
     BuildPlugin plugin;
     RegistryManager registry;
+
+    RegistryItem[] workQueue;
 }

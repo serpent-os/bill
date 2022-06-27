@@ -114,6 +114,14 @@ final class BuildPlugin : RegistryPlugin
         recipes[genPkgID(recipe)] = recipe;
     }
 
+    /**
+     * Mark this as installed now
+     */
+    void markInstalled(in RegistryItem item)
+    {
+        installationMap[recipes[item.pkgID]] = true;
+    }
+
 private:
 
     RegistryItem recipetoItem(const(Spec)* spec) const
