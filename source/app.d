@@ -29,7 +29,7 @@ import std.string : startsWith, format;
 
 void main() @system
 {
-    configureLogging(ColorLoggerFlags.Color|ColorLoggerFlags.Timestamps);
+    configureLogging(ColorLoggerFlags.Color | ColorLoggerFlags.Timestamps);
     globalLogLevel = LogLevel.trace;
 
     trace("--- bill is now starting ---");

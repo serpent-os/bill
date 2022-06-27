@@ -18,12 +18,14 @@
 
 module bill.build_queue;
 
+import bill.build_worker;
 import core.atomic : atomicFetchAdd;
+import std.concurrency : send, receive, register, thisTid;
 import std.container.rbtree;
 import std.datetime.systime : Clock, SysTime;
 import std.experimental.logger;
-import std.string : format;
 import std.parallelism : totalCPUs;
+import std.string : format;
 
 /**
  * Every build gets a job index.
@@ -85,6 +87,8 @@ public final class BuildQueue
         {
             numWorkers = totalCPUs() - 1;
         }
+        workers.reserve(numWorkers);
+        workers.length = numWorkers;
 
         info(format!"BuildQueue initialised with %d workers"(numWorkers));
     }
@@ -94,6 +98,27 @@ public final class BuildQueue
      */
     void run()
     {
+        register("buildQueueMain", thisTid());
+        running = true;
+
+        /* Start all the bees */
+        foreach (i; 0 .. numWorkers)
+        {
+            workers[i] = new BuildWorker(i);
+            workers[i].start();
+        }
+
+        /* Cleanup time. */
+        foreach (ref worker; workers)
+        {
+            worker.join();
+            worker.destroy();
+        }
+
+        while (running)
+        {
+            break;
+        }
     }
 
     /**
@@ -127,4 +152,6 @@ private:
     BuildTree builds;
     ulong buildIndex;
     uint numWorkers;
+    bool running;
+    BuildWorker[] workers;
 }
