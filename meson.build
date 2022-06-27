@@ -38,7 +38,6 @@ global_includes = [
 # binary sources
 bill_sources = [
 	'source/bill/package.d',
-	'source/bill/build_controller.d',
 	'source/bill/build_plugin.d',
 	'source/bill/buildconf.d',
 	'source/bill/stage.d',

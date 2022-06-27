@@ -23,7 +23,10 @@ import std.conv : to, ConvException;
 import std.stdio : File;
 import std.file : dirEntries, SpanMode;
 import moss.format.source.spec;
-import bill.build_controller;
+import bill.build_plugin;
+import std.range : empty;
+import std.array : array;
+import std.algorithm : map, joiner;
 
 /**
  * Stage encapsulation
@@ -43,7 +46,9 @@ final class Stage
         /* We're loaded in a map operation */
         _workTree = workTree.dup;
         _index = 0;
-        controller = new BuildController();
+        registry = new RegistryManager();
+        plugin = new BuildPlugin();
+        registry.addPlugin(plugin);
 
         immutable nom = workTree.baseName;
         immutable partial = nom["stage".length .. $];
@@ -97,18 +102,48 @@ final class Stage
             }
             auto spec = new Spec(File(item.name));
             spec.parse();
-            controller.addRecipe(spec);
+            addRecipe(spec);
         }
     }
-
-    void build() @system
+    /**
+     * Add a recipe to our set of work
+     */
+    void addRecipe(Spec* recipe) @system
     {
-        controller.build();
+        plugin.addRecipe(recipe);
+        trace(format!"Loaded recipe for %s [%s]"(recipe.source.name,
+                recipe.source.versionIdentifier));
+    }
+
+    void build()
+    {
+        /* We need to build and install everything in the stage. */
+        auto names = cast(RegistryItem[]) registry.listAvailable().array;
+        Transaction tx = registry.transaction();
+        tx.installPackages(names);
+        auto toApply = tx.apply();
+        if (toApply.empty)
+        {
+            fatal("No build order defined!");
+        }
+        auto problems = tx.problems;
+        if (!problems.empty)
+        {
+            error("Cannot proceed with build due to problems: ");
+            foreach (problem; problems)
+            {
+                error(problem);
+            }
+            fatal("quitting");
+        }
+        auto renderString = toApply.map!((a) => format!"%s (%s)"(a.info.name, a.info.versionID));
+        info(format!"Build order: %s"(renderString.joiner(", ")));
     }
 
 private:
 
     ulong _index;
     string _workTree;
-    BuildController controller;
+    BuildPlugin plugin;
+    RegistryManager registry;
 }

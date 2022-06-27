@@ -19,7 +19,7 @@
 
 module bill.build_plugin;
 
-import moss.deps.registry;
+public import moss.deps.registry;
 import moss.format.source.spec;
 import std.algorithm : filter, map;
 import std.array : array, byPair;
