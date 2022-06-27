@@ -12,6 +12,9 @@
 		},
 		"moss-deps": {
 			"path": "../moss-deps"
+		},
+		"moss-format:source": {
+			"path": "../moss-format"
 		}
 	},
 	"dflags": [
