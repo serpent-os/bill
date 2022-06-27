@@ -46,7 +46,12 @@ final class Stage
         return _index;
     }
 
-    override pure const(string) toString() @safe
+    /**
+     * String representation of Stage
+     *
+     * Returns: allocated string
+     */
+    override pure const(string) toString() @safe const
     {
         return format!"stage(%d)"(_index);
     }
