@@ -117,6 +117,8 @@ final class Stage
 
     void build()
     {
+        import std.algorithm : filter;
+
         /* We need to build and install everything in the stage. */
         auto names = cast(RegistryItem[]) registry.listAvailable().array;
         Transaction tx = registry.transaction();
@@ -136,11 +138,10 @@ final class Stage
             }
             fatal("quitting");
         }
-        auto renderString = toApply.map!((a) => format!"%s (%s)"(a.info.name, a.info.versionID));
-        info(format!"Build order: %s"(renderString.joiner(", ")));
 
-        /* Current work queue */
         workQueue = toApply;
+        auto renderString = workQueue.map!((a) => format!"%s (%s)"(a.info.name, a.info.versionID));
+        info(format!"Build order: %s"(renderString.joiner(", ")));
     }
 
 private:
