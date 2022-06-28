@@ -38,9 +38,19 @@ public final class BuildWorker : Thread
     this(QueueAPI parent, uint workerIndex)
     {
         super(&runnable);
-        this.workerIndex = workerIndex;
+        this._workerIndex = workerIndex;
         isDaemon = false;
         this.parent = parent;
+    }
+
+    /**
+     * Worker index
+     *
+     * Returns: integer worker index
+     */
+    pragma(inline, true) pure @property uint workerIndex() @safe @nogc nothrow const
+    {
+        return _workerIndex;
     }
 
     /**
@@ -134,14 +144,17 @@ private:
 
             /* Look for messages now */
             receive((WorkerWakeMessage msg) {
-                msg.sender.send(WorkerWakeResponse(ourID));
+                if (msg.blocking)
+                {
+                    msg.sender.send(WorkerWakeResponse(ourID));
+                }
                 info(format!"Worker %d looking for work"(workerIndex));
                 lookForWork = true;
             }, (WorkerStopMessage msg) { shutdownRequired = true; });
         }
     }
 
-    uint workerIndex;
+    uint _workerIndex;
     Tid ourID;
     QueueAPI parent;
     bool running;

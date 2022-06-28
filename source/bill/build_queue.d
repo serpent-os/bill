@@ -27,6 +27,8 @@ import std.experimental.logger;
 import std.parallelism : totalCPUs;
 import std.string : format;
 import bill.build_api;
+import std.range : enumerate;
+import std.algorithm : each, filter, map;
 
 /**
  * Sorted BuildItem by job index - no dupes!
@@ -86,7 +88,6 @@ public final class BuildQueue : QueueAPI
         /* Main loop */
         while (running)
         {
-            /* Immediately request shutdown as we dont "work" */
             shutdown();
 
             receive((WorkerStopResponse msg) {
@@ -129,6 +130,22 @@ public final class BuildQueue : QueueAPI
     }
 
 private:
+
+    void awakenWorkers()
+    {
+        auto availableWorkers = isWorkerAvailable.enumerate
+            .filter!((w) => w.value)
+            .map!((w) => workers[w.value]);
+        if (availableWorkers.empty)
+        {
+            trace("No available workers, awakening all of them");
+            workers.each!((ref w) => w.awaken(false));
+            return;
+        }
+        trace(format!"Awakening worker %s"(availableWorkers.front.workerIndex));
+        availableWorkers.front.awaken(true);
+        trace("done it");
+    }
 
     void shutdown()
     {
