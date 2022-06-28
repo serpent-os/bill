@@ -96,6 +96,11 @@ public final class BuildQueue : QueueAPI
                     running = false;
                     info("All workers completed");
                 }
+            }, (WorkerRequestJobMessage msg) {
+                /* TODO: Grab the next piece of work! */
+                WorkerRequestJobResponse response;
+                response.item = NullableBuildItem(BuildItem.init);
+                msg.sender.send(response);
             });
         }
 

@@ -17,6 +17,7 @@ module bill.build_api;
 
 public import std.concurrency : Tid;
 public import std.datetime.systime : SysTime;
+public import std.typecons : Nullable;
 
 /**
  * Every build gets a job index.
@@ -76,6 +77,11 @@ public struct BuildItem
      */
     SysTime updated;
 }
+
+/**
+ * Request for work may be null
+ */
+public alias NullableBuildItem = Nullable!(BuildItem, BuildItem.init);
 
 /**
  * The BuildQueue implements our QueueAPI
@@ -149,4 +155,21 @@ struct WorkerStopMessage
 struct WorkerStopResponse
 {
     Tid sender;
+}
+
+/**
+ * Worker is now requesting something to do.
+ */
+struct WorkerRequestJobMessage
+{
+    Tid sender;
+}
+
+/**
+ * Worker recieves a potentially null job. go back to sleep :P
+ */
+struct WorkerRequestJobResponse
+{
+    Tid sender;
+    NullableBuildItem item;
 }

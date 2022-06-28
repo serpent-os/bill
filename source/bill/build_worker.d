@@ -58,7 +58,7 @@ public final class BuildWorker : Thread
      */
     void awaken(bool blocking = true)
     {
-        ourID.send(WorkerWakeMessage(thisTid(), blocking));
+        ourID.prioritySend(WorkerWakeMessage(thisTid(), blocking));
         if (blocking)
         {
             receiveOnly!WorkerWakeResponse;
@@ -101,6 +101,8 @@ private:
 
         while (running)
         {
+            WorkerRequestJobResponse nextWork;
+
             /* Handle shutdown */
             if (shutdownRequired)
             {
@@ -116,11 +118,23 @@ private:
             {
                 info(format!"Worker %d looking for work"(workerIndex));
                 lookForWork = false;
+                controller.send(WorkerRequestJobMessage(ourID));
+                nextWork = receiveOnly!WorkerRequestJobResponse;
+            }
+
+            /* Can haz job? */
+            if (nextWork.item.isNull)
+            {
+                trace(format!"Worker %d found no work"(workerIndex));
+            }
+            else
+            {
+                trace(format!"Worker %d found work: %s"(workerIndex, nextWork.item.get));
             }
 
             /* Look for messages now */
             receive((WorkerWakeMessage msg) {
-                msg.sender.send(WorkerWakeMessage(ourID));
+                msg.sender.send(WorkerWakeResponse(ourID));
                 info(format!"Worker %d looking for work"(workerIndex));
                 lookForWork = true;
             }, (WorkerStopMessage msg) { shutdownRequired = true; });
