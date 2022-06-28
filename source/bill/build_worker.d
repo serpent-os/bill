@@ -42,6 +42,15 @@ public final class BuildWorker : Thread
         isDaemon = false;
     }
 
+    /**
+     * Blocking main thread call, unlocks the thread
+     */
+    void startServing()
+    {
+        ourID.send(WorkerBeginMessage(thisTid()));
+        receiveOnly!WorkerBeginResponse;
+    }
+
 private:
 
     /**
@@ -57,6 +66,12 @@ private:
         receiveOnly!WorkerActivatedResponse;
 
         info(format!"Worker %d registered"(workerIndex));
+
+        /* Await work transition */
+        auto msg = receiveOnly!WorkerBeginMessage;
+        msg.sender.send(WorkerBeginResponse(ourID));
+
+        info(format!"Worker %d awaiting work"(workerIndex));
     }
 
     uint workerIndex;

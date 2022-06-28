@@ -31,3 +31,19 @@ struct WorkerActivatedMessage
 struct WorkerActivatedResponse
 {
 }
+
+/**
+ * Set the worker to its main loop
+ */
+struct WorkerBeginMessage
+{
+    Tid sender;
+}
+
+/**
+ * Ok boss.
+ */
+struct WorkerBeginResponse
+{
+    Tid sender;
+}

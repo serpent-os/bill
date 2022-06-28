@@ -116,6 +116,7 @@ public final class BuildQueue
         }
 
         ensureStarted();
+        activateWorkers();
         warning("Ending builds");
 
         /* Tear down the workers */
@@ -156,6 +157,20 @@ private:
                 msg.sender.send(WorkerActivatedResponse());
                 ++activeWorkers;
             });
+        }
+    }
+
+    /**
+     * Pivot the workers into "go go go" mode.
+     *
+     * Each worker has been awaiting this message and will begin their
+     * main loop.
+     */
+    void activateWorkers()
+    {
+        foreach (ref worker; workers)
+        {
+            worker.startServing();
         }
     }
 
