@@ -85,7 +85,7 @@ public interface QueueAPI
     /**
      * Called from each thread to await a work condition
      */
-    abstract void awaitWork();
+    void awaitWork();
 }
 
 /**
