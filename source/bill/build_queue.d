@@ -31,41 +31,6 @@ import core.sync.condition;
 import bill.build_api;
 
 /**
- * Every build gets a job index.
- */
-private alias BuildIndex = ulong;
-
-/**
- * We set a BuildStatus per job.
- */
-private enum BuildStatus
-{
-    Pending = 0,
-    Claimed,
-    Failed,
-    Succeeded,
-}
-
-/**
- * Encapsulation of a build item
- *
- * Maps a string ID to our internal build type
- */
-private struct BuildItem
-{
-    BuildIndex index;
-
-    /** 
-     *  Associated package ID
-     */
-    string pkgID;
-
-    /* Timing information */
-    SysTime creation;
-    SysTime updated;
-}
-
-/**
  * Sorted BuildItem by job index - no dupes!
  */
 private alias BuildTree = RedBlackTree!(BuildItem, "a.index < b.index", false);
