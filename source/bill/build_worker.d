@@ -63,7 +63,7 @@ private:
         ourID = thisTid();
 
         /* Immediately send a "we're up message" */
-        controller.send(WorkerActivatedMessage(ourID));
+        controller.send(WorkerActivatedMessage(ourID, workerIndex));
         receiveOnly!WorkerActivatedResponse;
 
         info(format!"Worker %d registered"(workerIndex));

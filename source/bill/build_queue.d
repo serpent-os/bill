@@ -59,6 +59,10 @@ public final class BuildQueue : QueueAPI
         workers.reserve(numWorkers);
         workers.length = numWorkers;
 
+        /* Set all the workers as "free" (available) */
+        isWorkerAvailable.reserve(numWorkers);
+        isWorkerAvailable.length = numWorkers;
+
         mutNotify = new Mutex();
         condNotify = new Condition(mutNotify);
 
@@ -138,6 +142,9 @@ private:
             receive((WorkerActivatedMessage msg) {
                 msg.sender.send(WorkerActivatedResponse());
                 ++activeWorkers;
+                /* Map them */
+                tidToWorker[msg.sender] = msg.workerIndex;
+                isWorkerAvailable[msg.workerIndex] = true;
             });
         }
     }
@@ -173,4 +180,6 @@ private:
     BuildWorker[] workers;
     __gshared Condition condNotify;
     __gshared Mutex mutNotify;
+    __gshared bool[] isWorkerAvailable;
+    __gshared uint[Tid] tidToWorker;
 }

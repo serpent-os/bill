@@ -94,6 +94,7 @@ public interface QueueAPI
 struct WorkerActivatedMessage
 {
     Tid sender;
+    uint workerIndex;
 }
 
 /**
