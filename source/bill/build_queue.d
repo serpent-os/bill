@@ -115,24 +115,8 @@ public final class BuildQueue
             workers[i].start();
         }
 
-        ulong activeWorkers = 0;
-
-        while (running)
-        {
-            receive(/* Await startup for all workers first */
-                    (WorkerActivatedMessage msg) {
-                msg.sender.send(WorkerActivatedResponse());
-                ++activeWorkers;
-
-                /* All workers are now up and running */
-                if (activeWorkers == numWorkers)
-                {
-                    /* TODO: Pivot workers into work mode */
-                    trace("STOPPING BUILDS");
-                    running = false;
-                }
-            });
-        }
+        ensureStarted();
+        warning("Ending builds");
 
         /* Tear down the workers */
         foreach (ref thr; workers)
@@ -159,6 +143,21 @@ public final class BuildQueue
     }
 
 private:
+
+    /**
+     * Ensure all workers are registered
+     */
+    void ensureStarted()
+    {
+        uint activeWorkers = 0;
+        while (activeWorkers < numWorkers)
+        {
+            receive((WorkerActivatedMessage msg) {
+                msg.sender.send(WorkerActivatedResponse());
+                ++activeWorkers;
+            });
+        }
+    }
 
     /**
      * Atomically increment the build index, return last usable
