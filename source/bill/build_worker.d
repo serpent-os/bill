@@ -56,10 +56,13 @@ public final class BuildWorker : Thread
      * Send a message to wake up and look for work
      * UB40 style
      */
-    void awaken()
+    void awaken(bool blocking = true)
     {
-        ourID.send(WorkerWakeMessage());
-        receiveOnly!WorkerWakeResponse;
+        ourID.send(WorkerWakeMessage(thisTid(), blocking));
+        if (blocking)
+        {
+            receiveOnly!WorkerWakeResponse;
+        }
     }
 
     /**

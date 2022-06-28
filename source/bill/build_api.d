@@ -123,6 +123,8 @@ struct WorkerBeginResponse
 struct WorkerWakeMessage
 {
     Tid sender;
+    /* If blocking, we must reply */
+    bool blocking;
 }
 
 /**
