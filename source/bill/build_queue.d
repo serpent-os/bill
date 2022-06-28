@@ -73,7 +73,7 @@ private alias BuildTree = RedBlackTree!(BuildItem, "a.index < b.index", false);
 /**
  * Dependency backed queue implementation.
  */
-public final class BuildQueue
+public final class BuildQueue : QueueAPI
 {
 
     /**
@@ -111,12 +111,17 @@ public final class BuildQueue
         /* Start all the bees */
         foreach (i; 0 .. numWorkers)
         {
-            workers[i] = new BuildWorker(i);
+            workers[i] = new BuildWorker(this, i);
             workers[i].start();
         }
 
         ensureStarted();
         activateWorkers();
+        warning("Waking..");
+        synchronized (mutNotify)
+        {
+            condNotify.notifyAll();
+        }
         warning("Ending builds");
 
         /* Tear down the workers */
@@ -141,6 +146,18 @@ public final class BuildQueue
         auto job = BuildItem(nextBuildIndex, pkgID, mctime, mctime);
         builds.insert([job]);
         trace(format!"New job allocated: %s"(job));
+    }
+
+    /**
+     * Await work. We will sleep for 2 seconds max to allow other events
+     * to happen.
+     */
+    override void awaitWork()
+    {
+        synchronized (mutNotify)
+        {
+            condNotify.wait(dur!"seconds"(2));
+        }
     }
 
 private:

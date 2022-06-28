@@ -18,6 +18,17 @@ module bill.build_api;
 public import std.concurrency : Tid;
 
 /**
+ * The BuildQueue implements our QueueAPI
+ */
+public interface QueueAPI
+{
+    /**
+     * Called from each thread to await a work condition
+     */
+    abstract void awaitWork();
+}
+
+/**
  * When a worker is activated, it should notify the main loop
  */
 struct WorkerActivatedMessage

@@ -35,11 +35,12 @@ public final class BuildWorker : Thread
     /**
      * Construct a new BuildWorker with the given job index
      */
-    this(uint workerIndex)
+    this(QueueAPI parent, uint workerIndex)
     {
         super(&runnable);
         this.workerIndex = workerIndex;
         isDaemon = false;
+        this.parent = parent;
     }
 
     /**
@@ -72,8 +73,12 @@ private:
         msg.sender.send(WorkerBeginResponse(ourID));
 
         info(format!"Worker %d awaiting work"(workerIndex));
+
+        parent.awaitWork();
+        info(format!"Woken up %d"(workerIndex));
     }
 
     uint workerIndex;
     Tid ourID;
+    QueueAPI parent;
 }
