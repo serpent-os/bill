@@ -26,8 +26,6 @@ import std.datetime.systime : Clock, SysTime;
 import std.experimental.logger;
 import std.parallelism : totalCPUs;
 import std.string : format;
-import core.sync.mutex;
-import core.sync.condition;
 import bill.build_api;
 
 /**
@@ -63,9 +61,6 @@ public final class BuildQueue : QueueAPI
         isWorkerAvailable.reserve(numWorkers);
         isWorkerAvailable.length = numWorkers;
 
-        mutNotify = new Mutex();
-        condNotify = new Condition(mutNotify);
-
         info(format!"BuildQueue initialised with %d workers"(numWorkers));
     }
 
@@ -86,14 +81,25 @@ public final class BuildQueue : QueueAPI
 
         ensureStarted();
         activateWorkers();
-        warning("Waking..");
-        synchronized (mutNotify)
-        {
-            condNotify.notifyAll();
-        }
-        warning("Ending builds");
+        ulong deadWorkers;
 
-        /* Tear down the workers */
+        /* Main loop */
+        while (running)
+        {
+            /* Immediately request shutdown as we dont "work" */
+            shutdown();
+
+            receive((WorkerStopResponse msg) {
+                ++deadWorkers;
+                if (deadWorkers == numWorkers)
+                {
+                    running = false;
+                    info("All workers completed");
+                }
+            });
+        }
+
+        /* Tear down */
         foreach (ref thr; workers)
         {
             thr.join();
@@ -117,20 +123,16 @@ public final class BuildQueue : QueueAPI
         trace(format!"New job allocated: %s"(job));
     }
 
-    /**
-     * Await work. We will sleep for 2 seconds max to allow other events
-     * to happen.
-     */
-    override void awaitWork()
-    {
-        synchronized (mutNotify)
-        {
-            condNotify.wait(dur!"seconds"(2));
-        }
-    }
-
 private:
 
+    void shutdown()
+    {
+        shuttingDown = true;
+        foreach (ref thr; workers)
+        {
+            thr.shutdown();
+        }
+    }
     /**
      * Ensure all workers are registered
      */
@@ -177,9 +179,8 @@ private:
     ulong buildIndex;
     uint numWorkers;
     bool running;
+    bool shuttingDown;
     BuildWorker[] workers;
-    __gshared Condition condNotify;
-    __gshared Mutex mutNotify;
     __gshared bool[] isWorkerAvailable;
     __gshared uint[Tid] tidToWorker;
 }

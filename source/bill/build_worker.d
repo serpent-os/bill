@@ -20,7 +20,7 @@ module bill.build_worker;
 
 import core.thread.osthread;
 import std.experimental.logger;
-import std.concurrency : send, receive, receiveOnly, thisTid, Tid, locate;
+import std.concurrency : send, receive, receiveOnly, thisTid, Tid, locate, prioritySend;
 import std.string : format;
 import bill.build_api;
 
@@ -52,6 +52,24 @@ public final class BuildWorker : Thread
         receiveOnly!WorkerBeginResponse;
     }
 
+    /**
+     * Send a message to wake up and look for work
+     * UB40 style
+     */
+    void awaken()
+    {
+        ourID.send(WorkerWakeMessage());
+        receiveOnly!WorkerWakeResponse;
+    }
+
+    /**
+     * Asynchrously shut down.
+     */
+    void shutdown()
+    {
+        ourID.prioritySend(WorkerStopMessage());
+    }
+
 private:
 
     /**
@@ -74,11 +92,40 @@ private:
 
         info(format!"Worker %d awaiting work"(workerIndex));
 
-        parent.awaitWork();
-        info(format!"Woken up %d"(workerIndex));
+        running = true;
+        bool lookForWork;
+        bool shutdownRequired;
+
+        while (running)
+        {
+            /* Handle shutdown */
+            if (shutdownRequired)
+            {
+                running = false;
+                lookForWork = false;
+                info(format!"Worker %d shutting down"(workerIndex));
+                controller.send(WorkerStopResponse(ourID));
+                break;
+            }
+
+            /* Handle wakeups / work requests */
+            if (lookForWork)
+            {
+                info(format!"Worker %d looking for work"(workerIndex));
+                lookForWork = false;
+            }
+
+            /* Look for messages now */
+            receive((WorkerWakeMessage msg) {
+                msg.sender.send(WorkerWakeMessage(ourID));
+                info(format!"Worker %d looking for work"(workerIndex));
+                lookForWork = true;
+            }, (WorkerStopMessage msg) { shutdownRequired = true; });
+        }
     }
 
     uint workerIndex;
     Tid ourID;
     QueueAPI parent;
+    bool running;
 }

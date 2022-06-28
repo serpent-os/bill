@@ -82,10 +82,6 @@ public struct BuildItem
  */
 public interface QueueAPI
 {
-    /**
-     * Called from each thread to await a work condition
-     */
-    void awaitWork();
 }
 
 /**
@@ -116,6 +112,39 @@ struct WorkerBeginMessage
  * Ok boss.
  */
 struct WorkerBeginResponse
+{
+    Tid sender;
+}
+
+/**
+ * Worker has been told to wake up and check for work.
+ * This is blocking as only unallocated workers are woken.
+ */
+struct WorkerWakeMessage
+{
+    Tid sender;
+}
+
+/**
+ * Sent in response to a WorkerWakeMessage
+ */
+struct WorkerWakeResponse
+{
+    Tid sender;
+}
+
+/**
+ * Main thread requires the worker to stop when it can.
+ */
+struct WorkerStopMessage
+{
+    Tid sender;
+}
+
+/**
+ * Worker acknowledges that it has stopped
+ */
+struct WorkerStopResponse
 {
     Tid sender;
 }
