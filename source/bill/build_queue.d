@@ -33,7 +33,7 @@ import std.algorithm : each, filter, map;
 /**
  * Sorted BuildItem by job index - no dupes!
  */
-private alias BuildTree = RedBlackTree!(BuildItem, "a.index < b.index", false);
+private alias BuildTree = RedBlackTree!(BuildItem*, "a.index < b.index", false);
 
 /**
  * Dependency backed queue implementation.
@@ -124,7 +124,7 @@ public final class BuildQueue : QueueAPI
     void enqueue(const(string) pkgID)
     {
         immutable auto mctime = Clock.currTime();
-        auto job = BuildItem(nextBuildIndex, pkgID, mctime, mctime);
+        auto job = new BuildItem(nextBuildIndex, pkgID, mctime, mctime);
         builds.insert([job]);
         trace(format!"New job allocated: %s"(job));
     }
