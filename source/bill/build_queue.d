@@ -136,7 +136,7 @@ private:
      */
     void ensureStarted()
     {
-        uint activeWorkers = 0;
+        uint activeWorkers;
         while (activeWorkers < numWorkers)
         {
             receive((WorkerActivatedMessage msg) {
